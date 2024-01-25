@@ -4,7 +4,7 @@ SCRIPT_LOCATION=$0
 cd "$(dirname "$SCRIPT_LOCATION")"
 WORK_DIR=$(pwd)
 
-BASE_IMAGE_DEFAULT="nvidia/cuda:11.8.0-runtime-ubuntu22.04"
+BASE_IMAGE_DEFAULT="nvidia/cuda:11.7.1-runtime-ubuntu22.04"
 BASE_IMAGE_DEFAULT_CPU="ubuntu:22.04"
 
 BASE_IMAGE=$BASE_IMAGE_DEFAULT
