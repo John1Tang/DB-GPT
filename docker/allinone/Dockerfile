@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 
 RUN apt-get update && apt-get install -y wget gnupg lsb-release net-tools
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
 
 RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb
 RUN dpkg -i mysql-apt-config_0.8.17-1_all.deb
@@ -22,7 +22,7 @@ RUN mkdir /docker-entrypoint-initdb.d \
 ENV MYSQL_ROOT_PASSWORD=aa123456
 ENV LOCAL_DB_PASSWORD="$MYSQL_ROOT_PASSWORD"
 
-RUN cp /app/assets/schema/knowledge_management.sql /docker-entrypoint-initdb.d/
+RUN cp /app/assets/schema/dbgpt.sql /docker-entrypoint-initdb.d/
 
 COPY docker/allinone/allinone-entrypoint.sh /usr/local/bin/allinone-entrypoint.sh
 COPY docker/examples/sqls/*_mysql.sql /docker-entrypoint-initdb.d/
