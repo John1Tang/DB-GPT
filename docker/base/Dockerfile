@@ -3,7 +3,7 @@ ARG BASE_IMAGE="nvidia/cuda:11.8.0-runtime-ubuntu22.04"
 FROM ${BASE_IMAGE}
 ARG BASE_IMAGE
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git python3 pip wget sqlite3 tzdata \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git python3 pip wget sqlite3 tzdata openjdk-17-jdk \
     && apt-get clean
 
 ARG BUILD_LOCAL_CODE="false"
@@ -30,7 +30,9 @@ WORKDIR /app
 RUN pip3 install --upgrade pip -i $PIP_INDEX_URL \
     && pip3 install -i $PIP_INDEX_URL ".[$DB_GPT_INSTALL_MODEL]" \
     # install openai for proxyllm
-    && pip3 install -i $PIP_INDEX_URL ".[openai]"
+    && pip3 install -i $PIP_INDEX_URL ".[openai]" \
+    && pip3 install -i $PIP_INDEX_URL pyspark==3.3.4 \
+    && pip3 install -i $PIP_INDEX_URL psycopg2-binary
 
 RUN (if [ "${LANGUAGE}" = "zh" ]; \
         # language is zh, download zh_core_web_sm from github
