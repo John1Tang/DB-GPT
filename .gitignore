@@ -183,3 +183,5 @@ thirdparty
 # Ignore awel DAG visualization files
 /examples/**/*.gv
 /examples/**/*.gv.pdf
+
+*.uuid
