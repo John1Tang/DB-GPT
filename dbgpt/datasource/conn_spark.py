@@ -35,7 +35,8 @@ class SparkConnect(BaseConnect):
         )
         self.path = file_path
         self.table_name = "temp"
-        self.df = self.create_df(self.path)
+        self.jdbc_url = kwargs.get('db_name')
+        self.df = self.create_df(self.path, self.jdbc_url)
 
     @classmethod
     def from_file_path(
@@ -47,11 +48,15 @@ class SparkConnect(BaseConnect):
         except Exception as e:
             print("load spark datasource error" + str(e))
 
-    def create_df(self, path):
+    def create_df(self, path, jdbc_url):
         """Create a Spark DataFrame from Datasource path(now support parquet, jdbc, orc, libsvm, csv, text, json.).
         return: Spark DataFrame
         reference:https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html
+        :param path:
+        :param jdbc_url:
         """
+        if jdbc_url and jdbc_url.startswith("jdbc:"):
+            return self.create_df_from_jdbc(jdbc_url, self.table_name)
         extension = (
             "text" if path.rsplit(".", 1)[-1] == "txt" else path.rsplit(".", 1)[-1]
         )
@@ -59,7 +64,17 @@ class SparkConnect(BaseConnect):
             path, format=extension, inferSchema="true", header="true"
         )
 
-    def run(self, sql):
+    def create_df_from_jdbc(self, jdbc_url, table):
+        """Create a Spark DataFrame from JDBC source.
+        return: Spark DataFrame
+        """
+        return self.spark_session.read \
+            .format("jdbc") \
+            .option("url", jdbc_url) \
+            .option("dbtable", table) \
+            .load()
+
+    def run(self, sql, **kwargs):
         print(f"spark sql to run is {sql}")
         self.df.createOrReplaceTempView(self.table_name)
         df = self.spark_session.sql(sql)
