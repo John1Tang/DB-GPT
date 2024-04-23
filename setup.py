@@ -307,9 +307,9 @@ def _build_wheels(
 
 
 def torch_requires(
-    torch_version: str = "2.2.1",
-    torchvision_version: str = "0.17.1",
-    torchaudio_version: str = "2.2.1",
+    torch_version: str = "2.0.1",
+    torchvision_version: str = "0.15.2",
+    torchaudio_version: str = "2.0.2",
 ):
     os_type, _ = get_cpu_avx_support()
     torch_pkgs = [
