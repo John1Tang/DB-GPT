@@ -11,11 +11,10 @@ RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb && \
     apt-get clean
 
 # Configure MySQL APT repository for Ubuntu
-RUN echo "deb http://repo.mysql.com/apt/ubuntu/ jammy mysql-apt-config" | tee /etc/apt/sources.list.d/mysql.list && \
-    echo "deb http://repo.mysql.com/apt/ubuntu/ jammy mysql-5.7" | tee -a /etc/apt/sources.list.d/mysql.list && \
+RUN echo "deb http://repo.mysql.com/apt/ubuntu/ jammy mysql-5.7" | tee /etc/apt/sources.list.d/mysql.list && \
     mkdir -p /etc/apt/keyrings && \
     wget -qO - https://repo.mysql.com/RPM-GPG-KEY-mysql | gpg --dearmor -o /etc/apt/keyrings/mysql.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/ubuntu/ jammy mysql-apt-config" | tee -a /etc/apt/sources.list.d/mysql.list && \
+    echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/ubuntu/ jammy mysql-apt-config" | tee /etc/apt/sources.list.d/mysql.list && \
     apt-get update
 
 # Install MySQL server
