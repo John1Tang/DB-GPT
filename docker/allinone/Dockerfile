@@ -5,20 +5,29 @@ FROM ${BASE_IMAGE}
 RUN pip install dashscope
 RUN apt-get update && apt-get install -y wget gnupg lsb-release net-tools
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
+# Add MySQL APT repository
+RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.17-1_all.deb && \
+    apt-get clean
 
-RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb
-RUN dpkg -i mysql-apt-config_0.8.17-1_all.deb
+# Configure MySQL APT repository for Ubuntu
+RUN echo "deb http://repo.mysql.com/apt/ubuntu/ jammy mysql-apt-config" | tee /etc/apt/sources.list.d/mysql.list && \
+    echo "deb http://repo.mysql.com/apt/ubuntu/ jammy mysql-5.7" | tee -a /etc/apt/sources.list.d/mysql.list && \
+    mkdir -p /etc/apt/keyrings && \
+    wget -qO - https://repo.mysql.com/RPM-GPG-KEY-mysql | gpg --dearmor -o /etc/apt/keyrings/mysql.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/ubuntu/ jammy mysql-apt-config" | tee -a /etc/apt/sources.list.d/mysql.list && \
+    apt-get update
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C && apt-get update && apt-get install -y mysql-server && apt-get clean
+# Install MySQL server
+RUN apt-get update && apt-get install -y mysql-server && apt-get clean
 
 # Remote access
-RUN sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf \
-    && echo "[mysqld]\ncharacter_set_server=utf8mb4\ncollation-server=utf8mb4_unicode_ci\ninit_connect='SET NAMES utf8mb4'\n[mysql]\ndefault-character-set=utf8mb4\n[client]\ndefault-character-set=utf8mb4\n" >> /etc/mysql/my.cnf
+RUN sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf && \
+    echo "[mysqld]\ncharacter_set_server=utf8mb4\ncollation-server=utf8mb4_unicode_ci\ninit_connect='SET NAMES utf8mb4'\n[mysql]\ndefault-character-set=utf8mb4\n[client]\ndefault-character-set=utf8mb4\n" >> /etc/mysql/my.cnf
 
 # Init sql
-RUN mkdir /docker-entrypoint-initdb.d \
-    && echo "USE mysql;\nUPDATE user SET Host='%' WHERE User='root';\nFLUSH PRIVILEGES;" > /docker-entrypoint-initdb.d/init.sql
+RUN mkdir /docker-entrypoint-initdb.d && \
+    echo "USE mysql;\nUPDATE user SET Host='%' WHERE User='root';\nFLUSH PRIVILEGES;" > /docker-entrypoint-initdb.d/init.sql
 
 ENV MYSQL_ROOT_PASSWORD=aa123456
 ENV LOCAL_DB_PASSWORD="$MYSQL_ROOT_PASSWORD"
