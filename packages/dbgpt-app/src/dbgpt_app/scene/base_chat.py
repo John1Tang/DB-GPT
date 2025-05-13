@@ -474,7 +474,7 @@ class BaseChat(ABC):
             self.current_message.add_view_message(view_msg)
             span.end()
         except Exception as e:
-            print(traceback.format_exc())
+            logger.error(traceback.format_exc())
             logger.error("model response parse failed！" + str(e))
             if not text_output:
                 yield ModelOutput.build(
@@ -718,3 +718,4 @@ class BaseChat(ABC):
             for dict_item in antv_charts
             for key, value in dict_item.items()
         )
+

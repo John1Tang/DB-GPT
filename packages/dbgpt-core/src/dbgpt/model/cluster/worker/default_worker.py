@@ -486,7 +486,11 @@ class DefaultModelWorker(ModelWorker):
         if model_output.has_text:
             current_output += model_output.text
         incremental_output = current_output[len(previous_response) :]
-        print(incremental_output, end="", flush=True)
+        try:
+            print(incremental_output, end="", flush=True)
+        except OSError:
+            # optionally log or ignore the error
+            logger.error("OSError encountered during print in _handle_output")
 
         metrics = _new_metrics_from_model_output(last_metrics, is_first_generate, usage)
         model_output.metrics = metrics
@@ -639,3 +643,4 @@ def _try_import_torch():
         _torch_imported = True
     except ImportError:
         pass
+
