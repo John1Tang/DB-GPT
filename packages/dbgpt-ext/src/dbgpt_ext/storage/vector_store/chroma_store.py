@@ -117,7 +117,8 @@ class ChromaStore(VectorStoreBase):
         chroma_path = chroma_vector_config.get(
             "persist_path", os.path.join(PILOT_PATH, "data")
         )
-        self.persist_dir = os.path.join(resolve_root_path(chroma_path) + "/chromadb")
+        resolved_root = resolve_root_path(chroma_path) if chroma_path is not None else os.getcwd()
+        self.persist_dir = os.path.join(resolved_root, "chromadb")
         self.embeddings = embedding_fn
         if not self.embeddings:
             raise ValueError("Embeddings is None")
@@ -465,3 +466,4 @@ def _valid_chroma_collection_name(name):
         return False
 
     return True
+
